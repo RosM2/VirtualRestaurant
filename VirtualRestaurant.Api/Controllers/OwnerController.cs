@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VirtualRestaurant.BusinessLogic.CQRS.Commands;
 
 namespace VirtualRestaurant.Api.Controllers
 {
@@ -12,9 +14,11 @@ namespace VirtualRestaurant.Api.Controllers
 
     public class OwnerController : ControllerBase
     {
-        public OwnerController()
-        {
+        private readonly IMediator _mediator;
 
+        public OwnerController(IMediator mediator)
+        {
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -64,6 +68,9 @@ namespace VirtualRestaurant.Api.Controllers
         public IActionResult CreateRestaurant()
         {
 
+
+
+            var a = _mediator.Send(new CreateRestaurant.Command(new Domain.Models.Owner()));
             return Ok();
         }
 

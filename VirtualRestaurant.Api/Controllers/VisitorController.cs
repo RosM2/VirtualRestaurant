@@ -6,7 +6,7 @@ namespace VirtualRestaurant.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class CustomerController : ControllerBase
+    public class VisitorController : ControllerBase
     {
         
     }
