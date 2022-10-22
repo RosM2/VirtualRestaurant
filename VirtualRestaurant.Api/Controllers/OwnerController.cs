@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VirtualRestaurant.Api.DTO.RequestDto;
 using VirtualRestaurant.BusinessLogic.CQRS.Commands;
+using VirtualRestaurant.Domain.Models;
 
 namespace VirtualRestaurant.Api.Controllers
 {
@@ -65,14 +66,27 @@ namespace VirtualRestaurant.Api.Controllers
         [HttpPost]
         [Authorize]
         [Route("create-restaurant")]
-        public IActionResult CreateRestaurant()
+        public async Task<IActionResult> CreateRestaurant(CreateRestarauntDto restaraunt)
         {
+            var claims = HttpContext.User.Identities.First().Claims.ToList();
 
-
-
-            var a = _mediator.Send(new CreateRestaurant.Command(new Domain.Models.Owner()));
+            var result = await _mediator.Send(new CreateRestaurant.Command(new Restaurant() 
+            { 
+                Name = restaraunt.Name,
+                TotalTablesCount = restaraunt.TotalTablesCount,
+                FreeTablesCount = restaraunt.TotalTablesCount,
+                Owner = new Owner()
+                {
+                    Email = claims.First(x => x.Type.Contains("emailaddress")).Value,
+                    FirstName = claims.First(x => x.Type.Contains("givenname")).Value,
+                    LastName = claims.First(x => x.Type.Contains("surname")).Value
+                }            
+            }));
+            if (!result.Successful)
+            {
+                return BadRequest(result.Error);
+            }
             return Ok();
         }
-
     }
 }

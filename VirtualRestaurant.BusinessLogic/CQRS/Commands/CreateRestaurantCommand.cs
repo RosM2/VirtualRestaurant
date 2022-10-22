@@ -1,31 +1,44 @@
 ﻿using MediatR;
-using VirtualRestaurant.Domain.Models;
+using VirtualRestaurant.Persistence.Entities;
+using VirtualRestaurant.Persistence.Repository;
 
 namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
 {
     public class CreateRestaurant
     {
-        public class Command : IRequest<int>
+        public class Command : IRequest<Result>
         {
-            public Owner Owner;
+            public Domain.Models.Restaurant Restaurant;
 
-            public Command(Owner owner)
+            public Command(Domain.Models.Restaurant restaurant)
             {
-                Owner = owner;
+                Restaurant = restaurant;
             }
         }
 
-        public class Handler : IRequestHandler<Command, int>
+        public class Handler : IRequestHandler<Command, Result>
         {
-           // public int REPOSITORY { get; set; }
-            public Handler(/*int REPOSITORY*/)
+            private readonly RestaurantRepository _restarauntRepository;
+            public Handler(RestaurantRepository restarauntRepository)
             {
-                //REPOSITORY = REPOSITORY;
+                _restarauntRepository = restarauntRepository;
             }
-            public async Task<int> Handle(Command command, CancellationToken cancellationToken)
+            public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var a = command.Owner;
-                throw new NotImplementedException();
+
+                await _restarauntRepository.Add(new Restaurant() 
+                {
+                    Name = command.Restaurant.Name,
+                    TotalTablesCount = command.Restaurant.TotalTablesCount,
+                    FreeTablesCount = command.Restaurant.FreeTablesCount,
+                    Owner = new Owner() 
+                    {
+                        FirstName = command.Restaurant.Owner.FirstName,
+                        LastName = command.Restaurant.Owner.LastName,
+                        Email = command.Restaurant.Owner.Email
+                    }
+                });
+                return Result.Ok();
             }
         }
     }

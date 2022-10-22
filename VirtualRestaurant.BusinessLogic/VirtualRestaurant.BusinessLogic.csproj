@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VirtualRestaurant.Domain\VirtualRestaurant.Domain.csproj" />
+    <ProjectReference Include="..\VirtualRestaurant.Persistence\VirtualRestaurant.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

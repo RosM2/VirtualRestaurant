@@ -4,6 +4,7 @@ using System.Reflection;
 using MediatR;
 using VirtualRestaurant.Persistence.DataAccess;
 using VirtualRestaurant.BusinessLogic.CQRS.Commands;
+using VirtualRestaurant.Persistence.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediatR(typeof(CreateRestaurant));
+builder.Services.AddMediatR(typeof(CreateRestaurant).GetTypeInfo().Assembly);
+builder.Services.AddScoped<RestaurantRepository>();
 
 builder.Services
     .AddAuthentication(options =>
@@ -32,7 +34,6 @@ builder.Services.AddDbContext<SqlContext>(x => x.UseSqlServer(builder.Configurat
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

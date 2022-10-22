@@ -25,4 +25,8 @@
     <ProjectReference Include="..\VirtualRestaurant.Persistence\VirtualRestaurant.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTO\ResponseDto\" />
+  </ItemGroup>
+
 </Project>

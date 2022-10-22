@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using VirtualRestaurant.Domain.Models;
+using VirtualRestaurant.Persistence.Entities;
 
 namespace VirtualRestaurant.Persistence.DataAccess
 {
