@@ -1,4 +1,5 @@
-﻿using VirtualRestaurant.Persistence.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualRestaurant.Persistence.DataAccess;
 using VirtualRestaurant.Persistence.Entities;
 
 namespace VirtualRestaurant.Persistence.Repository
@@ -15,6 +16,11 @@ namespace VirtualRestaurant.Persistence.Repository
         {
             await _context.Restaurants.AddAsync(restaurant);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Restaurant>> GetAll()
+        {
+            return await _context.Restaurants.ToListAsync();
         }
     }
 }

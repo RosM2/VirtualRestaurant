@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using VirtualRestaurant.Persistence.Entities;
 using VirtualRestaurant.Persistence.Repository;
 
 namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
@@ -25,13 +24,12 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-
-                await _restarauntRepository.Add(new Restaurant() 
+                await _restarauntRepository.Add(new Persistence.Entities.Restaurant() 
                 {
                     Name = command.Restaurant.Name,
                     TotalTablesCount = command.Restaurant.TotalTablesCount,
                     FreeTablesCount = command.Restaurant.FreeTablesCount,
-                    Owner = new Owner() 
+                    Owner = new Persistence.Entities.Owner() 
                     {
                         FirstName = command.Restaurant.Owner.FirstName,
                         LastName = command.Restaurant.Owner.LastName,
