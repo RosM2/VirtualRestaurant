@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VirtualRestaurant.Domain.Models;
 using VirtualRestaurant.Persistence.Repository;
 
@@ -25,17 +20,25 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
         {
             private readonly ReservationRepository _reservationRepository;
 
+            private readonly RestaurantRepository _restaurantRepository;
+
             private readonly TableRepository _tableRepository;
 
-            public Handler(ReservationRepository reservationRepository, TableRepository tableRepository)
+            public Handler(ReservationRepository reservationRepository, TableRepository tableRepository, RestaurantRepository restaurantRepository)
             {
                 _reservationRepository = reservationRepository;
                 _tableRepository = tableRepository;
+                _restaurantRepository = restaurantRepository;
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {            
                 var table = await _tableRepository.GetByRestaurantId(command.Reservation.RestaurantId, command.Reservation.VisitorsCount);
+                if (table == null)
+                {
+                    return Result.Fail("This restaurant is already full");
+                }
                 await _tableRepository.UpdateTableBookStatus(table.Id);
+                await _restaurantRepository.UpdateTablesCount(command.Reservation.RestaurantId);
 
                 command.Reservation.Table = table;
                 await _reservationRepository.Add(command.Reservation);

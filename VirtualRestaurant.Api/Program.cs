@@ -6,6 +6,7 @@ using VirtualRestaurant.Persistence.DataAccess;
 using VirtualRestaurant.BusinessLogic.CQRS.Commands;
 using VirtualRestaurant.Persistence.Repository;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();

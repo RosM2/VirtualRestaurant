@@ -5,7 +5,5 @@
         public int NumberOfSits { get; set; }
 
         public string Location { get; set; }
-
-        public bool IsBooked { get; set; } 
     }
 }

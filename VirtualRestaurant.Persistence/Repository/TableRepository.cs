@@ -21,10 +21,13 @@ namespace VirtualRestaurant.Persistence.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAllTables(List<Table> tableList, int id)
+        public async Task<bool> UpdateAllTables(IList<Table> tableList, int id)
         {
             var oldTables = _context.Tables.Where(x => x.Restaurant.Id == id).ToList();
-
+            if (oldTables.Count != tableList.Count)
+            {
+                return false;
+            }
             for (int i = 0; i < oldTables.Count; i++)
             {
                 oldTables[i].IsBooked = tableList[i].IsBooked;
@@ -32,6 +35,7 @@ namespace VirtualRestaurant.Persistence.Repository
                 oldTables[i].Location = tableList[i].Location;
             }
             await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task UpdateTableBookStatus(int id)
@@ -43,7 +47,7 @@ namespace VirtualRestaurant.Persistence.Repository
 
         public async Task<Table> GetByRestaurantId(int id, int visitorsCount)
         {
-            return await _context.Tables.FirstOrDefaultAsync(x => x.Restaurant.Id == id && x.IsBooked == false && x.NumberOfSits >= visitorsCount);
+            return await _context.Tables.OrderBy(x => x.NumberOfSits).FirstOrDefaultAsync(x => x.Restaurant.Id == id && x.IsBooked == false && x.NumberOfSits >= visitorsCount);
         }
     }
 }

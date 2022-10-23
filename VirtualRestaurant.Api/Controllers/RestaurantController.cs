@@ -1,10 +1,8 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VirtualRestaurant.Api.DTO.RequestDto;
+using VirtualRestaurant.Api.DTO.ResponseDto;
 using VirtualRestaurant.BusinessLogic.CQRS.Commands;
 using VirtualRestaurant.BusinessLogic.CQRS.Queries;
 using VirtualRestaurant.Domain.Models;
@@ -13,59 +11,76 @@ namespace VirtualRestaurant.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
-    public class OwnerController : ControllerBase
+    
+    public class RestaurantController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public OwnerController(IMediator mediator)
+        public RestaurantController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("login")]
-        public IActionResult Login()
+        public async Task<IActionResult> GetAllRestaurants()
         {
-            return Ok($"Use this url to sign in via google: https://{Request.Host.Value}/api/owner/google-login");
-        }
-
-        //[HttpGet]
-        //[AllowAnonymous]
-        //[Route("logout")]
-        ////Add documentation string: "Use respond url to login via google"
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //    return Ok("Logouted");
-        //}
-
-        [HttpGet]
-        [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Route("google-login")]
-        public IActionResult GoogleLogin()
-        {
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
-
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Route("google-response")]
-        public async Task<IActionResult> GoogleResponse()
+            var result = await _mediator.Send(new GetRestaurants.Query());
+            if (result.Value.Count == 0)
             {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return Ok("No restaurants");
+            }
+            return Ok(result.Value.Select(x => new GetRestaurantsDto()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                FreeTablesCount = x.FreeTablesCount
+            }).ToList());
+        }
 
-            return Ok("Successufly login!");
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRestaurantId([FromRoute] int id)
+        {
+            var result = await _mediator.Send(new GetRestaurantById.Query(id));
+            if (result.Value == null)
+            {
+                return BadRequest("Wrong restaurant id");
+            }
+            return Ok(new GetRestaurantDto() 
+            {
+                Id = result.Value.Id,
+                Name = result.Value.Name,
+                FreeTablesCount = result.Value.FreeTablesCount,
+                TotalTablesCount = result.Value.TotalTablesCount
+            });
+        }
+
+        [HttpPost("reserve")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
+        {
+            if (dto.VisitorsCount <= 0 || !dto.VisitorEmail.Contains("@") || dto.ReservationDate < DateTime.UtcNow)
+            {
+                return BadRequest("Wrong entred info");
+            }
+            var result = await _mediator.Send(new CreateReservation.Command(new Reservation()
+            {
+                ReservationDate = dto.ReservationDate,
+                VisitorEmail = dto.VisitorEmail,
+                RestaurantId = dto.RestaurantId,
+                VisitorsCount = dto.VisitorsCount
+            }));
+            if (!result.Successful)
+            {
+                return BadRequest(result.Error);
+            }
+            return Ok();
         }
 
         [HttpPost]
         [Authorize]
-        [Route("create-restaurant")]
+        [Route("create")]
         public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestarauntDto restaraunt)
         {
             var claims = HttpContext.User.Identities.First().Claims.ToList();
@@ -79,8 +94,8 @@ namespace VirtualRestaurant.Api.Controllers
                 owner.FirstName = claims.First(x => x.Type.Contains("givenname")).Value;
                 owner.LastName = claims.First(x => x.Type.Contains("surname")).Value;
             }
-            var result = await _mediator.Send(new CreateRestaurant.Command(new Restaurant() 
-            { 
+            var result = await _mediator.Send(new CreateRestaurant.Command(new Restaurant()
+            {
                 Name = restaraunt.Name,
                 TotalTablesCount = restaraunt.TotalTablesCount,
                 FreeTablesCount = restaraunt.TotalTablesCount,
@@ -95,7 +110,7 @@ namespace VirtualRestaurant.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("setup-restaurant")]
+        [Route("setup")]
         public async Task<IActionResult> SetupRestaurant([FromBody] SetupRestaurantDto dto)
         {
             var claims = HttpContext.User.Identities.First().Claims.ToList();
@@ -113,12 +128,15 @@ namespace VirtualRestaurant.Api.Controllers
             {
                 updatedTables.Add(new Table()
                 {
-                    IsBooked = dto.Tables[i].IsBooked,
                     NumberOfSits = dto.Tables[i].NumberOfSits,
                     Location = dto.Tables[i].Location
                 });
             }
-            await _mediator.Send(new SetupRestaurant.Command(updatedTables, dto.RestaurantId));
+            var result = await _mediator.Send(new SetupRestaurant.Command(updatedTables, dto.RestaurantId));
+            if (!result.Successful)
+            {
+                return BadRequest(result.Error);
+            }
             return Ok();
         }
     }

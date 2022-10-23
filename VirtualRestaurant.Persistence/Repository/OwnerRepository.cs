@@ -12,9 +12,9 @@ namespace VirtualRestaurant.Persistence.Repository
             _context = context;
         }
 
-        public async Task<Owner> GetByEmail(string email)
+        public Task<Owner> GetByEmail(string email)
         {
-            return await _context.Owners.FirstOrDefaultAsync(x => x.Email == email);
+            return _context.Owners.FirstOrDefaultAsync(x => x.Email == email);
         }
     }
 }

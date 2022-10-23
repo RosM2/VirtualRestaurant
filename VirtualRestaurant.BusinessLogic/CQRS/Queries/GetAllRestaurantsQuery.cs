@@ -6,7 +6,7 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Queries
 {
     public class GetRestaurants
     {
-        public class Query : IRequest<Result<List<Restaurant>>>
+        public class Query : IRequest<Result<IList<Restaurant>>>
         {
             public Query()
             {
@@ -14,17 +14,17 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Queries
             }
         }
 
-        public class Handler : IRequestHandler<Query, Result<List<Restaurant>>>
+        public class Handler : IRequestHandler<Query, Result<IList<Restaurant>>>
         {
             private readonly RestaurantRepository _restarauntRepository;
             public Handler(RestaurantRepository restarauntRepository)
             {
                 _restarauntRepository = restarauntRepository;
             }
-            public async Task<Result<List<Restaurant>>> Handle(Query query, CancellationToken cancellationToken)
+            public async Task<Result<IList<Restaurant>>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var result = await _restarauntRepository.GetAll();
-                return Result<List<Restaurant>>.Ok(result);
+                return Result<IList<Restaurant>>.Ok(result);
             }
         }
     }

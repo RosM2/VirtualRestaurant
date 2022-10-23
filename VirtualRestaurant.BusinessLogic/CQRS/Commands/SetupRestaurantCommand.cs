@@ -8,10 +8,10 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
     {
         public class Command : IRequest<Result>
         {
-            public List<Table> Tables;
+            public IList<Table> Tables;
             public int Id { get; set; }
 
-            public Command(List<Table> tables, int id)
+            public Command(IList<Table> tables, int id)
             {
                 Tables = tables;
                 Id = id;
@@ -28,8 +28,11 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                await _tableRepository.UpdateAllTables(command.Tables, command.Id);
-
+                var isSuccessfull = await _tableRepository.UpdateAllTables(command.Tables, command.Id);
+                if (!isSuccessfull)
+                {
+                    return Result.Fail("Tables count doesn't match existing tables");
+                }
                 return Result.Ok();
             }
         }

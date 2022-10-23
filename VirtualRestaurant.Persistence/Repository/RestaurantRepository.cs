@@ -32,5 +32,12 @@ namespace VirtualRestaurant.Persistence.Repository
         {
             return await _context.Restaurants.AnyAsync(x => x.Id == id && x.Owner.Email == email);
         }
+
+        public async Task UpdateTablesCount(int restaurantId)
+        {
+            var restaurant = await _context.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId);
+            restaurant.FreeTablesCount = restaurant.FreeTablesCount - 1;
+            await _context.SaveChangesAsync();
+        }
     }
 }
