@@ -9,7 +9,7 @@ using VirtualRestaurant.Persistence.Repository;
 
 namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
 {
-    public class CreateReservationCommand
+    public class CreateReservation
     {
         public class Command : IRequest<Result>
         {
@@ -33,9 +33,12 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 _tableRepository = tableRepository;
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
-            {
+            {            
+                var table = await _tableRepository.GetByRestaurantId(command.Reservation.RestaurantId, command.Reservation.VisitorsCount);
+                await _tableRepository.UpdateTableBookStatus(table.Id);
+
+                command.Reservation.Table = table;
                 await _reservationRepository.Add(command.Reservation);
-                await _tableRepository.UpdateTableBookStatus(2);
                 return Result.Ok();
             }
         }

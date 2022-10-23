@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VirtualRestaurant.Api.DTO.RequestDto;
 using VirtualRestaurant.Api.DTO.ResponseDto;
+using VirtualRestaurant.BusinessLogic.CQRS.Commands;
 using VirtualRestaurant.BusinessLogic.CQRS.Queries;
+using VirtualRestaurant.Domain.Models;
 
 namespace VirtualRestaurant.Api.Controllers
 {
@@ -48,7 +50,13 @@ namespace VirtualRestaurant.Api.Controllers
         [HttpPost("reserve")]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
         {
-            await _mediator.Send(new )
+            await _mediator.Send(new CreateReservation.Command(new Reservation()
+            {
+                ReservationDate = dto.ReservationDate,
+                VisitorEmail = dto.VisitorEmail,
+                RestaurantId = dto.RestaurantId,
+                VisitorsCount = dto.VisitorsCount
+            }));
             return Ok();
         }
     }

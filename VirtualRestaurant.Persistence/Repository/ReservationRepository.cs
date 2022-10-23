@@ -14,6 +14,7 @@ namespace VirtualRestaurant.Persistence.Repository
         public async Task Add(Reservation reservation)
         {
             await _context.Reservations.AddAsync(reservation);
+            await _context.SaveChangesAsync();
         }
     }
 }

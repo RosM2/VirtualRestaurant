@@ -41,5 +41,9 @@ namespace VirtualRestaurant.Persistence.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Table> GetByRestaurantId(int id, int visitorsCount)
+        {
+            return await _context.Tables.FirstOrDefaultAsync(x => x.Restaurant.Id == id && x.IsBooked == false && x.NumberOfSits >= visitorsCount);
+        }
     }
 }
