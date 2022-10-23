@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VirtualRestaurant.Persistence.DataAccess;
 
@@ -11,9 +12,10 @@ using VirtualRestaurant.Persistence.DataAccess;
 namespace VirtualRestaurant.Persistence.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    partial class SqlContextModelSnapshot : ModelSnapshot
+    [Migration("20221023115146_Change_table_properties")]
+    partial class Change_table_properties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,9 +56,6 @@ namespace VirtualRestaurant.Persistence.Migrations
 
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("RestaurantId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("TableId")
                         .HasColumnType("int");

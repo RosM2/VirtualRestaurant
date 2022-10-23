@@ -14,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(typeof(CreateRestaurant).GetTypeInfo().Assembly);
 builder.Services.AddScoped<RestaurantRepository>();
+builder.Services.AddScoped<OwnerRepository>();
+builder.Services.AddScoped<TableRepository>();
+builder.Services.AddScoped<ReservationRepository>();
 
 builder.Services
     .AddAuthentication(options =>

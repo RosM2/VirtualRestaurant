@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using VirtualRestaurant.Domain.Models;
 using VirtualRestaurant.Persistence.Repository;
 
 namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
@@ -7,35 +8,46 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
     {
         public class Command : IRequest<Result>
         {
-            public Domain.Models.Restaurant Restaurant;
+            public Restaurant Restaurant;
+            public Owner Owner { get; set; }
 
-            public Command(Domain.Models.Restaurant restaurant)
+            public Command(Restaurant restaurant, Owner owner)
             {
                 Restaurant = restaurant;
+                Owner = owner;
             }
         }
 
         public class Handler : IRequestHandler<Command, Result>
         {
             private readonly RestaurantRepository _restarauntRepository;
-            public Handler(RestaurantRepository restarauntRepository)
+
+            private readonly TableRepository _tableRepository;
+
+            public Handler(RestaurantRepository restarauntRepository, TableRepository tableRepository)
             {
                 _restarauntRepository = restarauntRepository;
+                _tableRepository = tableRepository;
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                await _restarauntRepository.Add(new Persistence.Entities.Restaurant() 
+                var restaurant = new Restaurant()
                 {
                     Name = command.Restaurant.Name,
                     TotalTablesCount = command.Restaurant.TotalTablesCount,
                     FreeTablesCount = command.Restaurant.FreeTablesCount,
-                    Owner = new Persistence.Entities.Owner() 
-                    {
-                        FirstName = command.Restaurant.Owner.FirstName,
-                        LastName = command.Restaurant.Owner.LastName,
-                        Email = command.Restaurant.Owner.Email
-                    }
-                });
+                    Owner = command.Owner
+                };
+
+                await _restarauntRepository.Add(restaurant);
+
+                var tablesList = new List<Table>();
+                for (int i = 0; i < command.Restaurant.TotalTablesCount; i++)
+                {
+                    tablesList.Add(new Table() { Restaurant = restaurant });
+                }
+                await _tableRepository.Add(tablesList);
+
                 return Result.Ok();
             }
         }
