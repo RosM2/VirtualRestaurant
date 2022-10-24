@@ -11,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+var filePath = Path.Combine(AppContext.BaseDirectory, "VirtualRestaurant.Api.xml");
+builder.Services.AddSwaggerGen(config => config.IncludeXmlComments(filePath));
 
 builder.Services.AddMediatR(typeof(CreateRestaurant).GetTypeInfo().Assembly);
 builder.Services.AddScoped<RestaurantRepository>();

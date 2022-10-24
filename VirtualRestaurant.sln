@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRestaurant.Api", "VirtualRestaurant.Api\VirtualRestaurant.Api.csproj", "{AAC23DCF-2DB5-4CEF-81CC-B2ECD85EA3F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRestaurant.Api", "VirtualRestaurant.Api\VirtualRestaurant.Api.csproj", "{AAC23DCF-2DB5-4CEF-81CC-B2ECD85EA3F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRestaurant.Domain", "VirtualRestaurant.Domain\VirtualRestaurant.Domain.csproj", "{41E34C75-A7A7-4697-A91F-6A02ABC50783}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRestaurant.Domain", "VirtualRestaurant.Domain\VirtualRestaurant.Domain.csproj", "{41E34C75-A7A7-4697-A91F-6A02ABC50783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRestaurant.Persistence", "VirtualRestaurant.Persistence\VirtualRestaurant.Persistence.csproj", "{25BFCC65-149B-4AA9-B711-17DFE88B8C1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRestaurant.Persistence", "VirtualRestaurant.Persistence\VirtualRestaurant.Persistence.csproj", "{25BFCC65-149B-4AA9-B711-17DFE88B8C1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRestaurant.BusinessLogic", "VirtualRestaurant.BusinessLogic\VirtualRestaurant.BusinessLogic.csproj", "{9FE80421-F2F6-497B-92B2-0D4AD862285C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRestaurant.BusinessLogic", "VirtualRestaurant.BusinessLogic\VirtualRestaurant.BusinessLogic.csproj", "{9FE80421-F2F6-497B-92B2-0D4AD862285C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

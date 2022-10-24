@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VirtualRestaurant.Api.DTO.RequestDto;
 using VirtualRestaurant.Api.DTO.ResponseDto;
@@ -21,8 +20,10 @@ namespace VirtualRestaurant.Api.Controllers
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Use this endpoint to get all available restaurants
+        /// </summary>
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAllRestaurants()
         {
             var result = await _mediator.Send(new GetRestaurants.Query());
@@ -38,8 +39,10 @@ namespace VirtualRestaurant.Api.Controllers
             }).ToList());
         }
 
+        /// <summary>
+        /// Use this endpoint to get restaurant by id
+        /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetRestaurantId([FromRoute] int id)
         {
             var result = await _mediator.Send(new GetRestaurantById.Query(id));
@@ -56,8 +59,10 @@ namespace VirtualRestaurant.Api.Controllers
             });
         }
 
+        /// <summary>
+        /// Use this endpoint to reserve restaurant(enter correct restaurantId, email which contains "@", reservationDate must be future date, visitorsCount must be > 0)
+        /// </summary>
         [HttpPost("reserve")]
-        [AllowAnonymous]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
         {
             if (dto.VisitorsCount <= 0 || !dto.VisitorEmail.Contains("@") || dto.ReservationDate < DateTime.UtcNow)
@@ -77,23 +82,20 @@ namespace VirtualRestaurant.Api.Controllers
             }
             return Ok();
         }
-
+        /// <summary>
+        /// Use this endpoint to create restaurant(You have to be authorized by google login), enter all required info
+        /// </summary>
         [HttpPost]
-        [Authorize]
         [Route("create")]
         public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestarauntDto restaraunt)
         {
             var claims = HttpContext.User.Identities.First().Claims.ToList();
-
+            if (!claims.Any(x => x.Type.Contains("emailaddress")) || (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value == null)
+            {
+                return Unauthorized();
+            }
             var owner = (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value;
 
-            if (owner == null)
-            {
-                owner = new Owner();
-                owner.Email = claims.First(x => x.Type.Contains("emailaddress")).Value;
-                owner.FirstName = claims.First(x => x.Type.Contains("givenname")).Value;
-                owner.LastName = claims.First(x => x.Type.Contains("surname")).Value;
-            }
             var result = await _mediator.Send(new CreateRestaurant.Command(new Restaurant()
             {
                 Name = restaraunt.Name,
@@ -108,13 +110,20 @@ namespace VirtualRestaurant.Api.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Use this endpoint to setup restaurant(You have to be authorized by google login),
+        /// enter all required info, count of tables, which you post from body must match tables count,
+        /// that you entered in createRestaurant request
+        /// </summary>
         [HttpPost]
-        [Authorize]
         [Route("setup")]
         public async Task<IActionResult> SetupRestaurant([FromBody] SetupRestaurantDto dto)
         {
             var claims = HttpContext.User.Identities.First().Claims.ToList();
-
+            if (!claims.Any(x => x.Type.Contains("emailaddress")) || (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value == null)
+            {
+                return Unauthorized();
+            }
             var owner = (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value;
 
             var isOwner = (await _mediator.Send(new CheckRestaurantOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value, dto.RestaurantId))).Value;

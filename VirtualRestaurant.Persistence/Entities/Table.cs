@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VirtualRestaurant.Domain.Models
+namespace VirtualRestaurant.Persistence.Entities
 {
     public class Table
     {
+        [Key]
         public int Id { get; set; }
 
         public Restaurant Restaurant { get; set; }

@@ -1,5 +1,7 @@
-﻿using VirtualRestaurant.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualRestaurant.Domain.Models;
 using VirtualRestaurant.Persistence.DataAccess;
+using VirtualRestaurant.Persistence.Mapper;
 
 namespace VirtualRestaurant.Persistence.Repository
 {
@@ -13,7 +15,12 @@ namespace VirtualRestaurant.Persistence.Repository
 
         public async Task Add(Reservation reservation)
         {
-            await _context.Reservations.AddAsync(reservation);
+            var table = await _context.Tables.FirstOrDefaultAsync(x => x.Id == reservation.Table.Id);
+
+            var reservationEntity = ReservationMapper.ToEntity(reservation);
+            reservationEntity.Table = table;
+
+            await _context.Reservations.AddAsync(reservationEntity);
             await _context.SaveChangesAsync();
         }
     }

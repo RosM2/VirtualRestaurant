@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VirtualRestaurant.BusinessLogic.CQRS.Queries;
+using VirtualRestaurant.BusinessLogic.Handlers.Commands;
+using VirtualRestaurant.Domain.Models;
 
 namespace VirtualRestaurant.Api.Controllers
 {
@@ -11,6 +15,16 @@ namespace VirtualRestaurant.Api.Controllers
     [AllowAnonymous]
     public class AuthorizationController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public AuthorizationController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        /// <summary>
+        /// This endpoint returns url, which is used for google authentication and authorization
+        /// </summary>
         [HttpGet]
         [Route("login")]
         public IActionResult Login()
@@ -32,9 +46,22 @@ namespace VirtualRestaurant.Api.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [Route("google-response")]
         public async Task<IActionResult> GoogleResponse()
-            {
+        {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var claims = HttpContext.User.Identities.First().Claims.ToList();
 
+            var owner = (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value;
+
+            if (owner == null)
+            {
+                owner = new Owner()
+                {
+                    Email = claims.First(x => x.Type.Contains("emailaddress")).Value,
+                    FirstName = claims.First(x => x.Type.Contains("givenname")).Value,
+                    LastName = claims.First(x => x.Type.Contains("surname")).Value
+                };
+                await _mediator.Send(new CreateOwner.Command(owner));
+            }             
             return Ok("Successfully loged in");
         }
     }

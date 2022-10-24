@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VirtualRestaurant.Domain.Models
+namespace VirtualRestaurant.Persistence.Entities
 {
     public class Owner
     {
+        [Key]
         public int Id { get; set; }
 
         public string FirstName { get; set; }

@@ -31,6 +31,11 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
             }
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
+                var isExists = await _restarauntRepository.CheckIfExists(command.Restaurant.Name);
+                if (isExists) 
+                {
+                    return Result.Fail("This restaurant name already exists");
+                }                  
                 var restaurant = new Restaurant()
                 {
                     Name = command.Restaurant.Name,
@@ -40,6 +45,8 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 };
 
                 await _restarauntRepository.Add(restaurant);
+                var restaurantId = await _restarauntRepository.GetIdByName(restaurant.Name);
+                restaurant.Id = restaurantId;
 
                 var tablesList = new List<Table>();
                 for (int i = 0; i < command.Restaurant.TotalTablesCount; i++)

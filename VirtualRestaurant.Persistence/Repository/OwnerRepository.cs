@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualRestaurant.Persistence.DataAccess;
 using VirtualRestaurant.Domain.Models;
+using VirtualRestaurant.Persistence.Mapper;
 
 namespace VirtualRestaurant.Persistence.Repository
 {
@@ -12,9 +13,15 @@ namespace VirtualRestaurant.Persistence.Repository
             _context = context;
         }
 
-        public Task<Owner> GetByEmail(string email)
+        public async Task<Owner> GetByEmail(string email)
         {
-            return _context.Owners.FirstOrDefaultAsync(x => x.Email == email);
+            return OwnerMapper.FromEntity(await _context.Owners.FirstOrDefaultAsync(x => x.Email == email));
+        }
+
+        public async Task Add(Owner owner)
+        {
+            await _context.AddAsync(OwnerMapper.ToEntity(owner));
+            await _context.SaveChangesAsync();
         }
     }
 }

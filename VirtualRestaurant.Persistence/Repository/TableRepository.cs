@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualRestaurant.Domain.Models;
 using VirtualRestaurant.Persistence.DataAccess;
+using VirtualRestaurant.Persistence.Mapper;
 
 namespace VirtualRestaurant.Persistence.Repository
 {
@@ -16,7 +17,12 @@ namespace VirtualRestaurant.Persistence.Repository
         {
             foreach (var item in tableList)
             {
-                await _context.Tables.AddAsync(item);
+                var restaurant = await _context.Restaurants.FirstOrDefaultAsync(x => x.Id == item.Restaurant.Id);
+
+                var itemEntity = TableMapper.ToEntity(item);
+                itemEntity.Restaurant = restaurant;
+
+                await _context.Tables.AddAsync(itemEntity);
             }   
             await _context.SaveChangesAsync();
         }
@@ -47,7 +53,16 @@ namespace VirtualRestaurant.Persistence.Repository
 
         public async Task<Table> GetByRestaurantId(int id, int visitorsCount)
         {
-            return await _context.Tables.OrderBy(x => x.NumberOfSits).FirstOrDefaultAsync(x => x.Restaurant.Id == id && x.IsBooked == false && x.NumberOfSits >= visitorsCount);
+            var table = TableMapper.FromEntity(await _context.Tables.OrderBy(x => x.NumberOfSits).FirstOrDefaultAsync(x => x.Restaurant.Id == id && x.IsBooked == false && x.NumberOfSits >= visitorsCount));
+            var restaurant = (await _context.Restaurants.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id));
+            if (restaurant == null)
+            {
+                return table;
+            }
+            table.Restaurant = RestaurantMapper.FromEntity(restaurant);
+            var owner = await _context.Owners.FirstOrDefaultAsync(x => x.Id == restaurant.Owner.Id);
+            table.Restaurant.Owner = OwnerMapper.FromEntity(owner);
+            return table;
         }
     }
 }
