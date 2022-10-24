@@ -24,6 +24,7 @@ namespace VirtualRestaurant.Api.Controllers
 
         /// <summary>
         /// This endpoint returns url, which is used for google authentication and authorization
+        /// (Before testing api, enter a command in Nugget Package Manager Console: Update-Database, and be sure, that MSSQL Server installed)
         /// </summary>
         [HttpGet]
         [Route("login")]
