@@ -8,7 +8,6 @@
             {
                 return null;
             }
-
             var domainOwner = new Domain.Models.Owner()
             {
                 Id = owner.Id,
@@ -16,17 +15,15 @@
                 LastName = owner.LastName,
                 FirstName = owner.FirstName
             };
-
             return domainOwner;
         }
 
-        public static Entities.Owner ToEntity(this Domain.Models.Owner owner)
+        public static Persistence.Entities.Owner ToEntity(this Domain.Models.Owner owner)
         {
             if (owner == null)
             {
                 return null;
             }
-
             var entityOwner = new Persistence.Entities.Owner()
             {
                 Id = owner.Id,
@@ -34,7 +31,6 @@
                 LastName = owner.LastName,
                 FirstName = owner.FirstName
             };
-
             return entityOwner;
         }
     }

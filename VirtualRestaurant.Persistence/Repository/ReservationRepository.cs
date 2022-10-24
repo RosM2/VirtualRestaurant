@@ -8,7 +8,6 @@ namespace VirtualRestaurant.Persistence.Repository
     public class ReservationRepository
     {
         private readonly SqlContext _context;
-
         public ReservationRepository(SqlContext context)
         {
             _context = context;
@@ -17,11 +16,6 @@ namespace VirtualRestaurant.Persistence.Repository
         public async Task Add(Reservation reservation)
         {
             var table = await _context.Tables.FirstOrDefaultAsync(x => x.Id == reservation.Table.Id);
-
-            if (table == null)
-            {
-                throw new ArgumentException("Table is not found");
-            }
 
             var reservationEntity = ReservationMapper.ToEntity(reservation);
             reservationEntity.Table = table;

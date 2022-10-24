@@ -14,18 +14,15 @@
         }
 
         public bool Successful { get; protected set; }
-
         public string Error { get; protected set; }
 
         public static Result Ok() => new Result();
-
         public static Result Fail(string error) => new Result(error);
     }
 
     public sealed class Result<T> : Result
     {
         private readonly T _value;
-
         private Result(T value)
         {
             _value = value;
@@ -46,9 +43,7 @@
                 return _value;
             }
         }
-
         public static Result<T> Ok(T value) => new Result<T>(value);
-
         public new static Result<T> Fail(string error) => new Result<T>(error);
     }
 }

@@ -9,7 +9,6 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
         public class Command : IRequest<Result>
         {
             public IList<Table> Tables;
-
             public int Id { get; set; }
 
             public Command(IList<Table> tables, int id)
@@ -27,7 +26,6 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
             {
                 _tableRepository = tableRepository;
             }
-
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
                 var isSuccessfull = await _tableRepository.UpdateAllTables(command.Tables, command.Id);
@@ -35,7 +33,6 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 {
                     return Result.Fail("Tables count doesn't match existing tables");
                 }
-
                 return Result.Ok();
             }
         }
