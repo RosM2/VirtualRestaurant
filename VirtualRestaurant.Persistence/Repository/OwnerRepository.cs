@@ -8,6 +8,7 @@ namespace VirtualRestaurant.Persistence.Repository
     public class OwnerRepository
     {
         private readonly SqlContext _context;
+
         public OwnerRepository(SqlContext context)
         {
             _context = context;
@@ -15,7 +16,14 @@ namespace VirtualRestaurant.Persistence.Repository
 
         public async Task<Owner> GetByEmail(string email)
         {
-            return OwnerMapper.FromEntity(await _context.Owners.FirstOrDefaultAsync(x => x.Email == email));
+            var owner = await _context.Owners.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (owner == null)
+            {
+                throw new ArgumentException("Owner is not found");
+            }
+
+            return OwnerMapper.FromEntity(owner);
         }
 
         public async Task Add(Owner owner)

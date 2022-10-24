@@ -2,13 +2,14 @@
 {
     public static class ReservationMapper
     {
-        public static Persistence.Entities.Reservation ToEntity(this Domain.Models.Reservation reservation)
+        public static Entities.Reservation ToEntity(this Domain.Models.Reservation reservation)
         {
             if (reservation == null)
             {
                 return null;
             }
-            var entityReservation = new Persistence.Entities.Reservation()
+
+            var entityReservation = new Entities.Reservation()
             {
                 Id = reservation.Id,
                 ReservationDate = reservation.ReservationDate,
@@ -16,6 +17,7 @@
                 VisitorEmail = reservation.VisitorEmail,
                 VisitorsCount = reservation.VisitorsCount
             };
+
             return entityReservation;
         }
     }

@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VirtualRestaurant.Domain.Models;
 using VirtualRestaurant.Persistence.Repository;
 
@@ -29,6 +24,7 @@ namespace VirtualRestaurant.BusinessLogic.Handlers.Commands
             {
                 _ownerRepository = ownerRepository;
             }
+
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
                 await _ownerRepository.Add(command.Owner);

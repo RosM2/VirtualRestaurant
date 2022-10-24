@@ -9,6 +9,7 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
         public class Command : IRequest<Result>
         {
             public Restaurant Restaurant;
+
             public Owner Owner { get; set; }
 
             public Command(Restaurant restaurant, Owner owner)
@@ -29,13 +30,16 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 _restarauntRepository = restarauntRepository;
                 _tableRepository = tableRepository;
             }
+
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
                 var isExists = await _restarauntRepository.CheckIfExists(command.Restaurant.Name);
+
                 if (isExists) 
                 {
                     return Result.Fail("This restaurant name already exists");
-                }                  
+                }       
+                
                 var restaurant = new Restaurant()
                 {
                     Name = command.Restaurant.Name,
@@ -45,6 +49,7 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 };
 
                 await _restarauntRepository.Add(restaurant);
+
                 var restaurantId = await _restarauntRepository.GetIdByName(restaurant.Name);
                 restaurant.Id = restaurantId;
 

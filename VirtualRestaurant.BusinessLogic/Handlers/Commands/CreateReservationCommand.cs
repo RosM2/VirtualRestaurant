@@ -30,13 +30,16 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Commands
                 _tableRepository = tableRepository;
                 _restaurantRepository = restaurantRepository;
             }
+
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {            
                 var table = await _tableRepository.GetByRestaurantId(command.Reservation.RestaurantId, command.Reservation.VisitorsCount);
+
                 if (table == null)
                 {
                     return Result.Fail("This restaurant is already full");
                 }
+
                 await _tableRepository.UpdateTableBookStatus(table.Id);
                 await _restaurantRepository.UpdateTablesCount(command.Reservation.RestaurantId);
 

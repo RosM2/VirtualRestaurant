@@ -27,10 +27,12 @@ namespace VirtualRestaurant.Api.Controllers
         public async Task<IActionResult> GetAllRestaurants()
         {
             var result = await _mediator.Send(new GetRestaurants.Query());
+
             if (result.Value.Count == 0)
             {
                 return Ok("No restaurants");
             }
+
             return Ok(result.Value.Select(x => new GetRestaurantsDto()
             {
                 Id = x.Id,
@@ -46,10 +48,12 @@ namespace VirtualRestaurant.Api.Controllers
         public async Task<IActionResult> GetRestaurantId([FromRoute] int id)
         {
             var result = await _mediator.Send(new GetRestaurantById.Query(id));
+
             if (result.Value == null)
             {
                 return BadRequest("Wrong restaurant id");
             }
+
             return Ok(new GetRestaurantDto() 
             {
                 Id = result.Value.Id,
@@ -69,6 +73,7 @@ namespace VirtualRestaurant.Api.Controllers
             {
                 return BadRequest("Wrong entred info");
             }
+
             var result = await _mediator.Send(new CreateReservation.Command(new Reservation()
             {
                 ReservationDate = dto.ReservationDate,
@@ -76,12 +81,15 @@ namespace VirtualRestaurant.Api.Controllers
                 RestaurantId = dto.RestaurantId,
                 VisitorsCount = dto.VisitorsCount
             }));
+
             if (!result.Successful)
             {
                 return BadRequest(result.Error);
             }
+
             return Ok();
         }
+
         /// <summary>
         /// Use this endpoint to create restaurant(You have to be authorized by google login), enter all required info
         /// </summary>
@@ -94,6 +102,7 @@ namespace VirtualRestaurant.Api.Controllers
             {
                 return Unauthorized();
             }
+
             var owner = (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value;
 
             var result = await _mediator.Send(new CreateRestaurant.Command(new Restaurant()
@@ -124,6 +133,7 @@ namespace VirtualRestaurant.Api.Controllers
             {
                 return Unauthorized();
             }
+
             var owner = (await _mediator.Send(new GetOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value))).Value;
 
             var isOwner = (await _mediator.Send(new CheckRestaurantOwner.Query(claims.First(x => x.Type.Contains("emailaddress")).Value, dto.RestaurantId))).Value;
@@ -141,11 +151,14 @@ namespace VirtualRestaurant.Api.Controllers
                     Location = dto.Tables[i].Location
                 });
             }
+
             var result = await _mediator.Send(new SetupRestaurant.Command(updatedTables, dto.RestaurantId));
+
             if (!result.Successful)
             {
                 return BadRequest(result.Error);
             }
+
             return Ok();
         }
     }

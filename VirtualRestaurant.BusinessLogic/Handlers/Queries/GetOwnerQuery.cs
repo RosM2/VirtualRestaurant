@@ -9,6 +9,7 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Queries
         public class Query : IRequest<Result<Owner>>
         {
             public string Email { get; set; }
+
             public Query(string email)
             {
                 Email = email;
@@ -18,10 +19,12 @@ namespace VirtualRestaurant.BusinessLogic.CQRS.Queries
         public class Handler : IRequestHandler<Query, Result<Owner>>
         {
             private readonly OwnerRepository _ownerRepository;
+
             public Handler(OwnerRepository ownerRepository)
             {
                 _ownerRepository = ownerRepository;
             }
+
             public async Task<Result<Owner>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var owner = await _ownerRepository.GetByEmail(query.Email);
